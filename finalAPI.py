@@ -4,14 +4,29 @@ from random import randint
 import re
 
 
-user_name = 'pikachu_killar'
-password = 'pikachu101'
+user_name = ''
+password = ''
+
+
+################### PROXY DICT
+
+
+
+IP = '159.65.69.157'
+PORT = '8118'
+HTTP_PROXY = 'http://'+IP+':'+PORT  
+HTTPS_PROXY = 'https://'+IP+':'+PORT  
+proxies = dict(http=HTTP_PROXY, https=HTTPS_PROXY)
+
+
+###################
+
 
 ################### SAVE DATA
 
 myData = [["UserName", "FullName", "Verified","Business","Email","BusinessEmail","PhoneNumber"]]
 
-##################
+################## LOGIN
 
 url = 'https://www.instagram.com/accounts/login/'
 url_main = url + 'ajax/'
@@ -26,6 +41,7 @@ res=sess.post(url_main, data=auth, headers=headers)
 cook=res.cookies.get_dict()
 sess_id = cook['sessionid']
 
+##################
 
 ########### GET USER ID
 uusr='deepanshuxpal'
@@ -98,22 +114,20 @@ myData.append(user_iuname,user_ifname,user_iverify,user_ibusiness,user_ibemail,u
     
 ########### FINAL SWIPE  
 end_cursor=''
-per_quer=[]
-
 star_itch=''
 flag=1
+count=0
 while flag==1:
-    time.sleep(randint(0,3))
-    followers_url = 'https://www.instagram.com/graphql/query/?query_hash=c76146de99bb02f6415203be841dd25a&variables={"id":"'+uu_id+'","include_reel":true,"fetch_mutual":false,"first":24,"after":"'+end_cursor+'"}'
+    count+=1
+    followers_url = 'https://www.instagram.com/graphql/query/?query_hash=c76146de99bb02f6415203be841dd25a&variables={"id":"'+uu_id+'","include_reel":true,"fetch_mutual":false,"first":200,"after":"'+end_cursor+'"}'
     header2={'Cookie':'sessionid='+sess_id}
     res3=sess.get(followers_url, headers=header2)
     data_user_pp1=res3.json()
     followers = data_user_pp1['data']['user']['edge_followed_by']['edges']
     end_cursor = data_user_pp1['data']['user']['edge_followed_by']['page_info']['end_cursor']
     
-    per_quer.append(len(followers))
     for follower in followers:
-        time.sleep(randint(0,5))
+        time.sleep(3)
         url_det = 'https://i.instagram.com/api/v1/users/'+follower['node']['id']+'/info/'
         res2=sess.get(url_det, headers=header1)
         data_user_pp2=res2.json()
@@ -149,7 +163,7 @@ while flag==1:
 
   
         
-    if end_cursor is None or len(final_followers)>=30000 :
+    if end_cursor is None or count>=30000 :
         flag=0
 
 
@@ -157,11 +171,16 @@ while flag==1:
 #################
 
 
+################# CSV SAVED
 
+out = open('out.csv', 'w')
+for row in myData:
+    for column in row:
+        out.write('%s;' % column)
+    out.write('\n')
+out.close()
 
-
-
-
+#################
 
 
 
