@@ -1,7 +1,11 @@
+import requests
+import time 
+from random import randint
+
 user_name = 'pikachu_killar'
 password = 'pikachu101'
 
-import requests
+
 
 url = 'https://www.instagram.com/accounts/login/'
 url_main = url + 'ajax/'
@@ -18,7 +22,7 @@ sess_id = cook['sessionid']
 
 
 ########### GET USER ID
-uusr='benyarts'
+uusr='deepanshuxpal'
 res1= sess.get('https://www.instagram.com/'+uusr+'/?__a=1')
 user_data=res1.json()
 
@@ -40,7 +44,12 @@ header1={'host':'i.instagram.com',
         'Cookie':'sessionid='+sess_id }
 res2=sess.get(url_det, headers=header1)
 data_user_pp=res2.json()
-bio_user = data_user_pp['user']['public_email']
+bio_user = data_user_pp['user']['biography']
+try:
+    bio_user = data_user_pp['user']['public_email']
+except:
+    print("no email exist bro")
+    
 count = data_user_pp['user']['follower_count']
 
 print(bio_user)
@@ -48,42 +57,36 @@ print(bio_user)
 ##############
 
 
-########### FIRST SWIPE
-
-followers_url = 'https://www.instagram.com/graphql/query/?query_hash=c76146de99bb02f6415203be841dd25a&variables={"id":"'+uu_id+'","include_reel":true,"fetch_mutual":false,"first":24,"after":""}'
-header2={'Cookie':'sessionid='+sess_id}
-res3=sess.get(followers_url, headers=header2)
-data_user_pp1=res3.json()
-followers = data_user_pp1['data']['user']['edge_followed_by']['edges']
-count = data_user_pp1['data']['user']['edge_followed_by']['count']
-end_cursor = data_user_pp1['data']['user']['edge_followed_by']['page_info']['end_cursor']
-for follower in followers:
-    print(follower['node']['username'])
-
-#################
-    
     
 ########### FINAL SWIPE  
-    
-hop_count=int((count-24)/24)
-if hop_count>=30000:
-    hop_count=30000
-
 end_cursor=''
 final_followers=[]
-for x in range(hop_count):
+final_followers_det=[]
+per_quer=[]
+
+star_itch=''
+flag=1
+while flag==1:
+    time.sleep(randint(0,3))
     followers_url = 'https://www.instagram.com/graphql/query/?query_hash=c76146de99bb02f6415203be841dd25a&variables={"id":"'+uu_id+'","include_reel":true,"fetch_mutual":false,"first":24,"after":"'+end_cursor+'"}'
     header2={'Cookie':'sessionid='+sess_id}
     res3=sess.get(followers_url, headers=header2)
     data_user_pp1=res3.json()
     followers = data_user_pp1['data']['user']['edge_followed_by']['edges']
     end_cursor = data_user_pp1['data']['user']['edge_followed_by']['page_info']['end_cursor']
+    
+    per_quer.append(len(followers))
     for follower in followers:
+        final_followers_det.append(follower)
         final_followers.append(follower['node']['username'])
+        if follower['node']['username'] == 'benyarts':
+            star_itch=follower
+    
+    if end_cursor is None :
+        flag=0
 
 
 len(final_followers)
-
 #################
 
 
