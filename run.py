@@ -1,11 +1,17 @@
 import requests
 import time 
 from random import randint
+import re
+
 
 user_name = 'pikachu_killar'
 password = 'pikachu101'
 
+################### SAVE DATA
 
+myData = [["UserName", "FullName", "Verified","Business","Email","BusinessEmail","PhoneNumber"]]
+
+##################
 
 url = 'https://www.instagram.com/accounts/login/'
 url_main = url + 'ajax/'
@@ -29,6 +35,19 @@ user_data=res1.json()
 user_id = user_data['graphql']['user']['id']
 ###########
 
+#################### FIND EMAIL FROM BIO
+
+
+def getEmails(str):
+    regex = r'([\w0-9._-]+@[\w0-9._-]+\.[\w0-9_-]+)'
+    elist = re.findall(regex, str, re.M|re.I)
+    if elist:
+        return elist[0]
+
+
+
+##################
+
 
 ########### GET USER DETAIL
 uu_id=user_id
@@ -45,14 +64,32 @@ header1={'host':'i.instagram.com',
 res2=sess.get(url_det, headers=header1)
 data_user_pp=res2.json()
 bio_user = data_user_pp['user']['biography']
-try:
-    bio_user = data_user_pp['user']['public_email']
-except:
-    print("no email exist bro")
-    
-count = data_user_pp['user']['follower_count']
 
-print(bio_user)
+
+user_ibemail = getEmails(bio_user) 
+user_iuname = data_user_pp['user']['username']
+user_ifname = data_user_pp['user']['full_name']
+
+user_iverify = data_user_pp['user']['username']
+user_ibusiness = data_user_pp['user']['full_name']
+
+try:
+    user_iemail = data_user_pp['user']['public_email']
+except:
+    user_iemail=''
+
+try:
+    user_ipno = data_user_pp['user']['public_phone_number']
+except:
+    user_ipno='' 
+    
+try:
+    user_icat = data_user_pp['user']['category']
+except:
+    user_icat='' 
+#count = data_user_pp['user']['follower_count']
+
+myData.append(user_iuname,user_ifname,user_iverify,user_ibusiness,user_ibemail,user_iemail,user_ipno)
 
 ##############
 
@@ -78,11 +115,8 @@ while flag==1:
     per_quer.append(len(followers))
     for follower in followers:
         final_followers_det.append(follower)
-        final_followers.append(follower['node']['username'])
-        if follower['node']['username'] == 'benyarts':
-            star_itch=follower
-    
-    if end_cursor is None :
+        final_followers.append(follower['node']['id'])
+    if end_cursor is None or len(final_followers)>=30000 :
         flag=0
 
 
