@@ -43,6 +43,7 @@ def getEmails(str):
     elist = re.findall(regex, str, re.M|re.I)
     if elist:
         return elist[0]
+    return ''
 
 
 
@@ -97,8 +98,6 @@ myData.append(user_iuname,user_ifname,user_iverify,user_ibusiness,user_ibemail,u
     
 ########### FINAL SWIPE  
 end_cursor=''
-final_followers=[]
-final_followers_det=[]
 per_quer=[]
 
 star_itch=''
@@ -114,14 +113,47 @@ while flag==1:
     
     per_quer.append(len(followers))
     for follower in followers:
-        final_followers_det.append(follower)
-        final_followers.append(follower['node']['id'])
+        time.sleep(randint(0,5))
+        url_det = 'https://i.instagram.com/api/v1/users/'+follower['node']['id']+'/info/'
+        res2=sess.get(url_det, headers=header1)
+        data_user_pp2=res2.json()
+        try:
+            bio_user = data_user_pp2['user']['biography']
+        except:
+            bio_user=''
+
+        user_ibemail = getEmails(bio_user) 
+        user_iuname = data_user_pp2['user']['username']
+        user_ifname = data_user_pp2['user']['full_name']
+
+        user_iverify = data_user_pp2['user']['is_verified']
+        user_ibusiness = data_user_pp2['user']['is_business']
+
+        try:
+            user_iemail = data_user_pp2['user']['public_email']
+        except:
+            user_iemail=''
+
+        try:
+            user_ipno = data_user_pp2['user']['public_phone_number']
+        except:
+            user_ipno='' 
+    
+        try:
+            user_icat = data_user_pp2['user']['category']
+        except:
+            user_icat='' 
+#count = data_user_pp['user']['follower_count']
+
+        myData.append([user_iuname,user_ifname,user_iverify,user_ibusiness,user_ibemail,user_iemail,user_ipno])
+
+  
         
     if end_cursor is None or len(final_followers)>=30000 :
         flag=0
 
 
-len(final_followers)
+
 #################
 
 
